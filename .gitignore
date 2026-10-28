@@ -1,0 +1,6 @@
+.DS_Store
+.research/
+dist/
+node_modules/
+*.tar.gz
+.openai/*.local.*

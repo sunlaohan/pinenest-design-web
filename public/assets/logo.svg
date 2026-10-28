@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="23" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 32 23" width="32">
+<g id="Union">
+<path d="M23.8 22.0254H32V23H0V22.0254H21.55V21.3432H23.8V22.0254Z" fill="var(--fill-0, black)"/>
+<path d="M32 0.38983H0.4V20.661H0V0H32V0.38983Z" fill="var(--fill-0, black)"/>
+<path d="M32 1.94915H1.9V20.661H1.5V1.55932H21.55V0.877119H23.8V1.55932H32V1.94915Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 3.11864H32V3.50847H3.4V20.661H3V3.11864H21.55V2.43644H23.8V3.11864Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 4.67797H32V5.0678H4.9V20.661H4.5V4.67797H21.55V3.99576H23.8V4.67797Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 6.23729H32V6.62712H6.4V20.661H6V6.23729H21.55V5.55508H23.8V6.23729Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 7.79661H32V8.18644H7.9V20.661H7.5V7.79661H21.55V7.11441H23.8V7.79661Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 9.35593H32V9.74576H9.4V20.661H9V9.35593H21.55V8.67373H23.8V9.35593Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 10.9153H32V11.3051H10.9V20.661H10.5V10.9153H21.55V10.2331H23.8V10.9153Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 12.4746H32V12.8644H12.4V20.661H12V12.4746H21.55V11.7924H23.8V12.4746Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 14.0339H32V14.4237H13.9V20.661H13.5V14.0339H21.55V13.3517H23.8V14.0339Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 15.5932H32V15.9831H15.4V20.661H15V15.5932H21.55V14.911H23.8V15.5932Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 17.1525H32V17.5424H16.9V20.661H16.5V17.1525H21.55V16.4703H23.8V17.1525Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 20.2712H32V20.661H18V20.2712H21.55V19.589H23.8V20.2712Z" fill="var(--fill-0, black)"/>
+<path d="M23.8 18.7119H32V19.1017H18V18.7119H21.55V18.0297H23.8V18.7119Z" fill="var(--fill-0, black)"/>
+</g>
+</svg>
