@@ -6,7 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = path.join(root, 'dist');
 const projects = JSON.parse(fs.readFileSync(path.join(root, 'content/projects.json'), 'utf8'));
 const xhs = 'https://www.xiaohongshu.com/user/profile/5c7b54f10000000012027540';
-const origin = 'https://pinenest-interior-studio.sunmingze02.chatgpt.site';
+const origin = new URL(process.env.SITE_URL || process.env.URL || 'https://pinenest-design.netlify.app').origin;
 const escape = (s) => String(s).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const tr = (v, tag = 'span', attrs = '') => `<${tag} data-zh="${escape(v[0])}" data-en="${escape(v[1])}" ${attrs}>${escape(v[0])}</${tag}>`;
 const t = (zh, en, tag = 'span', attrs = '') => tr([zh, en], tag, attrs);

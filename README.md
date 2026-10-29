@@ -19,6 +19,14 @@ npm run check
 
 构建输出位于 `dist/`，可部署至支持静态目录路由的托管服务。使用 `/404.html` 作为错误页面。
 
+## Netlify 部署
+
+项目名称：`pinenest-design`。构建配置保存在 `netlify.toml`，构建命令为 `npm run build && npm run check`，发布目录为 `dist`。
+
+首次部署使用本地构建后的静态文件上传，未连接 Git 仓库自动发布。后续可以重新构建并上传 `dist`，或连接代码仓库后由 Netlify 自动构建。
+
+站点绝对资源地址依次使用 `SITE_URL`、Netlify 提供的 `URL` 环境变量，默认是 `https://pinenest-design.netlify.app`。绑定自定义域名后重新构建即可更新分享图片地址。
+
 ## 内容与文件
 
 - `content/projects.json`：六个项目的中英文内容、年份、地点、面积、设计说明与图片信息。
