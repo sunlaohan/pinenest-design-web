@@ -32,7 +32,16 @@ for(const file of pages){
     checkedImages++;
   }
   if(/hello@studio\.com|Forma Studio|Emma Carter|\$20k/.test(html))issues.push(`${relative}: reference placeholder left behind`);
+  if(/xiaohongshu|Xiaohongshu|小红书/i.test(html))issues.push(`${relative}: old contact channel remains`);
+  if(!html.includes('id="wechat-qr"')||!html.includes('data-wechat'))issues.push(`${relative}: WeChat contact bubble missing`);
 }
+const contactHtml=fs.readFileSync(path.join(dist,'contact/index.html'),'utf8');
+assert.match(contactHtml,/<form[^>]+name="project-enquiry"[^>]+method="POST"[^>]+data-netlify="true"/);
+assert.match(contactHtml,/name="form-name" value="project-enquiry"/);
+assert.match(contactHtml,/name="contact" required/);
+assert.match(contactHtml,/name="email"/);
+assert.match(contactHtml,/netlify-honeypot="company"/);
+assert.match(contactHtml,/1291362786@qq\.com/);
 const projects=JSON.parse(fs.readFileSync(path.join(root,'content/projects.json'),'utf8'));
 assert.equal(projects.length,6);
 assert.equal(projects.reduce((n,p)=>n+p.photos,0),65);

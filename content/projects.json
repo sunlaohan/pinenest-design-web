@@ -44,6 +44,15 @@
     "service": ["旧房整体改造", "Home Renovation"],
     "cover": "cover-03.webp",
     "photos": 14,
+    "comparisons": [
+      {"title": ["客厅 · 视角一", "Living Room · View One"], "before": "golden-01.webp", "after": "golden-02.webp"},
+      {"title": ["客厅 · 视角二", "Living Room · View Two"], "before": "golden-03.webp", "after": "golden-04.webp"},
+      {"title": ["阳台与餐厅", "Balcony & Dining"], "before": "golden-05.webp", "after": "golden-06.webp"},
+      {"title": ["卧室一 · 视角一", "Bedroom One · View One"], "before": "golden-07.webp", "after": "golden-08.webp"},
+      {"title": ["卧室一 · 视角二", "Bedroom One · View Two"], "before": "golden-09.webp", "after": "golden-10.webp"},
+      {"title": ["卧室二", "Bedroom Two"], "before": "golden-11.webp", "after": "golden-12.webp"},
+      {"title": ["卫生间", "Bathroom"], "before": "golden-13.webp", "after": "golden-14.webp", "portrait": true}
+    ],
     "position": "50% 50%",
     "intro": ["打开一面墙，也打开生活的视野。为三口之家重新组织一处明亮、简洁的日常。", "Opening a wall opens a new perspective. A bright, simple home reorganized for a family of three."],
     "story": ["委托人是一位个体商户，为下一代三口之家购入这套二手住宅。她希望在控制预算的前提下，让家拥有更开阔的视野，以及简洁、时尚的空间感，提升一家人的居住体验。", "The client purchased this existing apartment for the next generation of her family. With a considered budget, she wanted a more open outlook and a simple, contemporary home for a family of three."],

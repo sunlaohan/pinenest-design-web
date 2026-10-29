@@ -16,6 +16,7 @@ function setLanguage(next) {
   });
   try { localStorage.setItem('pinenest-language', language); } catch {}
   if ($('#brief-result') && !$('#brief-result').hidden) makeBrief();
+  if ($('.brief-submit')?.disabled) $('[data-submit-label]').textContent = text('正在发送…', 'Sending…');
 }
 setLanguage(language);
 $$('.language-button').forEach(button => button.addEventListener('click', () => setLanguage(language === 'zh' ? 'en' : 'zh')));
@@ -33,14 +34,62 @@ window.addEventListener('scroll', () => {
 
 const menu = $('#menu');
 const menuButton = $('.menu-button');
-function closeMenu() { menu?.close(); menuButton?.setAttribute('aria-expanded', 'false'); }
+function closeMenu() { closeQrPopover(false); menu?.close(); menuButton?.setAttribute('aria-expanded', 'false'); }
 menuButton?.addEventListener('click', () => {
   menu.showModal();
   menuButton.setAttribute('aria-expanded', 'true');
 });
 $('.menu-close')?.addEventListener('click', closeMenu);
-menu?.addEventListener('close', () => menuButton?.setAttribute('aria-expanded', 'false'));
+menu?.addEventListener('close', () => { closeQrPopover(false); menuButton?.setAttribute('aria-expanded', 'false'); });
 $$('a', menu).forEach(a => a.addEventListener('click', closeMenu));
+
+// One reusable bubble keeps the supplied QR image intact on every contact entry point.
+const qrPopover = $('#wechat-qr');
+let qrTrigger = null;
+function positionQrPopover() {
+  if (!qrTrigger || qrPopover.hidden) return;
+  const anchor = qrTrigger.getBoundingClientRect();
+  const gap = 13;
+  const margin = 16;
+  const popup = qrPopover.getBoundingClientRect();
+  const above = innerHeight - anchor.bottom < popup.height + gap + margin && anchor.top > innerHeight - anchor.bottom;
+  const left = Math.max(margin, Math.min(anchor.left + anchor.width / 2 - popup.width / 2, innerWidth - popup.width - margin));
+  const targetTop = above ? anchor.top - popup.height - gap : anchor.bottom + gap;
+  const top = Math.max(margin, Math.min(targetTop, innerHeight - popup.height - margin));
+  qrPopover.style.left = `${left}px`;
+  qrPopover.style.top = `${top}px`;
+  qrPopover.dataset.placement = above ? 'above' : 'below';
+  qrPopover.style.setProperty('--qr-pointer', `${Math.max(20, Math.min(anchor.left + anchor.width / 2 - left, popup.width - 20))}px`);
+}
+function closeQrPopover(restoreFocus = false) {
+  if (!qrTrigger) return;
+  const previous = qrTrigger;
+  qrPopover.hidden = true;
+  previous.setAttribute('aria-expanded', 'false');
+  qrTrigger = null;
+  if (restoreFocus) previous.focus({ preventScroll: true });
+}
+$$('[data-wechat]').forEach(button => button.addEventListener('click', e => {
+  if (qrTrigger === button && !qrPopover.hidden) { closeQrPopover(true); return; }
+  closeQrPopover(false);
+  qrTrigger = button;
+  // Keep the bubble inside a modal menu when one is open, so it remains interactive.
+  (button.closest('dialog[open]') || document.body).append(qrPopover);
+  qrPopover.hidden = false;
+  button.setAttribute('aria-expanded', 'true');
+  positionQrPopover();
+  if (e.detail === 0) $('.qr-close', qrPopover).focus({ preventScroll: true });
+}));
+$('.qr-close', qrPopover)?.addEventListener('click', () => closeQrPopover(true));
+$('img', qrPopover)?.addEventListener('load', positionQrPopover);
+document.addEventListener('click', e => {
+  if (qrTrigger && !qrPopover.contains(e.target) && !qrTrigger.contains(e.target)) closeQrPopover(false);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && qrTrigger) { e.preventDefault(); e.stopPropagation(); closeQrPopover(true); }
+}, { capture: true });
+window.addEventListener('resize', positionQrPopover, { passive: true });
+window.addEventListener('scroll', () => closeQrPopover(false), { passive: true });
 
 // Content is visible first. Reveal effects are enabled only when the browser supports them.
 if ('IntersectionObserver' in window && !reducedMotion) {
@@ -128,6 +177,8 @@ function makeBrief() {
   const facts = [
     `${text('称呼', 'Name')}：${values.get('name')?.trim()}`,
     `${text('城市', 'City')}：${values.get('city')?.trim()}`,
+    `${text('联系方式', 'Contact')}：${values.get('contact')?.trim()}`,
+    values.get('email')?.trim() ? `${text('邮箱', 'Email')}：${values.get('email').trim()}` : '',
     `${text('类型', 'Type')}：${selected?.textContent || ''}`,
     `${text('面积', 'Area')}：${values.get('area')?.trim()}`,
     values.get('budget')?.trim() ? `${text('预算', 'Budget')}：${values.get('budget').trim()}` : '',
@@ -141,24 +192,56 @@ function makeBrief() {
 }
 if (form) {
   const serviceParam = new URLSearchParams(location.search).get('service');
-  if (['1', '2', '3', '4'].includes(serviceParam)) $('select[name="service"]', form).value = serviceParam;
-  form.addEventListener('submit', e => {
+  if (['1', '2', '3', '4'].includes(serviceParam)) $('select[name="service"]', form).selectedIndex = Number(serviceParam);
+  let submitting = false;
+  form.addEventListener('submit', async e => {
     e.preventDefault();
+    if (submitting) return;
+    $$('input:not([type="hidden"]), textarea', form).forEach(input => { input.value = input.value.trim(); });
     if (!form.reportValidity()) return;
-    makeBrief();
-    $('#brief-result').hidden = false;
-    $('#brief-result').scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' });
+    const submitButton = $('.brief-submit', form);
+    const submitLabel = $('[data-submit-label]', form);
+    const status = $('#form-status');
+    submitting = true;
+    submitButton.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+    submitLabel.textContent = text('正在发送…', 'Sending…');
+    status.hidden = true;
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString(),
+        signal: AbortSignal.timeout(20000),
+      });
+      if (!response.ok) throw new Error(`Submission failed: ${response.status}`);
+      makeBrief();
+      form.hidden = true;
+      $('#brief-result').hidden = false;
+      $('#brief-result').scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' });
+    } catch {
+      status.dataset.zh = '暂时未能发送，请稍后重试。你填写的内容已保留在当前页面，也可以通过微信联系我们。';
+      status.dataset.en = 'Your enquiry could not be sent. Please try again, or contact us on WeChat. Your details are still on this page.';
+      status.textContent = status.dataset[language];
+      status.hidden = false;
+      status.focus({ preventScroll: true });
+    } finally {
+      submitting = false;
+      submitButton.disabled = false;
+      form.removeAttribute('aria-busy');
+      submitLabel.textContent = submitLabel.dataset[language];
+    }
   });
   $('.copy-brief')?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(briefText);
-      $('.copy-status').textContent = text('已复制。可以前往小红书粘贴给松木设计。', 'Copied. Paste your brief into a message to Pinenest on Xiaohongshu.');
+      $('.copy-status').textContent = text('咨询记录已复制。', 'Your enquiry has been copied.');
     } catch {
       const selection = window.getSelection();
       const range = document.createRange();
       range.selectNodeContents($('#brief-output'));
       selection.removeAllRanges(); selection.addRange(range);
-      $('.copy-status').textContent = text('请复制已选中的内容，再前往小红书发送。', 'Copy the selected text and send it on Xiaohongshu.');
+      $('.copy-status').textContent = text('请复制已选中的咨询记录。', 'Copy the selected enquiry text.');
     }
   });
 }

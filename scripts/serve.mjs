@@ -10,6 +10,10 @@ const dist=path.join(root,'dist');
 const port=Number(process.env.PORT||4173);
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2','.txt':'text/plain'};
 http.createServer((req,res)=>{
+  if(!['GET','HEAD'].includes(req.method)){
+    res.writeHead(405,{'Content-Type':'text/plain; charset=utf-8','Allow':'GET, HEAD'}).end('Form submissions are available on the deployed Netlify site.');
+    return;
+  }
   let pathname;
   try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{res.writeHead(400).end();return;}
   let file=path.resolve(dist,'.'+pathname);
